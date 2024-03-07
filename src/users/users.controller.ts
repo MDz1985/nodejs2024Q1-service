@@ -20,8 +20,10 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -93,7 +95,6 @@ export class UsersController {
     @Body() updatePasswordDto: UpdatePasswordDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Omit<User, 'password'> | { error: string }> {
-    console.log(updatePasswordDto);
     if (
       !validate(userId) ||
       typeof updatePasswordDto?.newPassword !== 'string' ||
