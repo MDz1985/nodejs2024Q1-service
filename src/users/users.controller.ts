@@ -15,17 +15,34 @@ import { StatusCodes } from 'http-status-codes';
 import { Response } from 'express';
 import { validate } from 'uuid';
 import { UpdatePasswordDto } from './common/dto/update-password.dto';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiOkResponse({
+    status: 200,
+    description: 'Return the list of users',
+    type: [User],
+  })
   async getAllUsers(): Promise<User[]> {
     return this.usersService.getAllUsers();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get user bu id' })
+  @ApiOkResponse({ status: 200, description: 'Return the user', type: User })
+  @ApiBadRequestResponse({ status: 400, description: 'Invalid userId' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async getUserById(
     @Param('id') userId: string,
     @Res({ passthrough: true }) res: Response,
@@ -43,6 +60,11 @@ export class UsersController {
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create user' })
+  @ApiOkResponse({ status: 200, description: 'Return the user', type: User })
+  @ApiBadRequestResponse({ status: 400, description: 'Invalid data' })
+  @ApiResponse({ status: 409, description: 'User already exists' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async createUser(
     @Body() dto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
@@ -61,6 +83,11 @@ export class UsersController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update user password' })
+  @ApiOkResponse({ status: 200, description: 'Return the user', type: User })
+  @ApiBadRequestResponse({ status: 400, description: 'Invalid userId' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async updatePassword(
     @Param('id') userId: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
@@ -91,6 +118,11 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete user' })
+  @ApiOkResponse({ status: 204, description: 'User deleted' })
+  @ApiBadRequestResponse({ status: 400, description: 'Invalid userId' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
   async deleteUser(
     @Param('id') userId: string,
     @Res({ passthrough: true }) res: Response,
