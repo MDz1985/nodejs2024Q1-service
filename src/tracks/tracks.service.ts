@@ -32,4 +32,13 @@ export class TracksService {
   async deleteTrack(id: string): Promise<void> {
     this._tracks = this._tracks.filter((track) => track.id !== id);
   }
+
+  async removeArtistIdFromTrack(artistId: string) {
+    this._tracks = this._tracks.map((track: Track) => {
+      if (track.artistId === artistId) {
+        track.artistId = null;
+      }
+      return track;
+    });
+  }
 }
