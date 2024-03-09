@@ -2,7 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  Get, HttpStatus,
+  Get,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -124,9 +125,7 @@ export class AlbumsController {
       !updateAlbumDto?.year ||
       (updateAlbumDto?.artistId && !validate(updateAlbumDto?.artistId))
     ) {
-      res
-        .status(StatusCodes.BAD_REQUEST)
-        .send({ error: 'Invalid album data' });
+      res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid album data' });
       return;
     }
     const album = await this.albumsService.getAlbumById(albumId);
