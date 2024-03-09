@@ -82,13 +82,11 @@ export class AlbumsController {
     if (
       typeof dto !== 'object' ||
       dto === null ||
-      Object.keys(dto).length < 3 ||
-      Object.keys(dto).length > 4 ||
+      Object.keys(dto).length < 2 ||
+      Object.keys(dto).length > 3 ||
       typeof dto?.name !== 'string' ||
       typeof dto?.year !== 'number' ||
-      !validate(dto?.artistId)
-      // ||
-      // (dto?.artistId && typeof dto?.artistId !== 'string')
+      (dto?.artistId && !validate(dto?.artistId))
     ) {
       res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid data' });
       return;
@@ -124,7 +122,7 @@ export class AlbumsController {
       !validate(albumId) ||
       !updateAlbumDto?.name ||
       !updateAlbumDto?.year ||
-      !validate(updateAlbumDto?.artistId)
+      (updateAlbumDto?.artistId && !validate(updateAlbumDto?.artistId))
     ) {
       res
         .status(StatusCodes.BAD_REQUEST)
@@ -156,7 +154,7 @@ export class AlbumsController {
   })
   async deleteAlbum(
     @Param('id') albumId: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ): Promise<void> {
     if (!validate(albumId)) {
       res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid albumId' });
@@ -170,5 +168,6 @@ export class AlbumsController {
     await this.albumsService.deleteAlbum(albumId);
     await this.tracksService.removeAlbumIdFromTrack(albumId);
     res.status(StatusCodes.NO_CONTENT).send();
+    return;
   }
 }

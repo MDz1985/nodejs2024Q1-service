@@ -23,6 +23,7 @@ import { Response } from 'express';
 import { CreateArtistDto } from './common/dto/create-artist.dto';
 import { UpdateArtistDto } from './common/dto/update-artist.dto';
 import { TracksService } from '../tracks/tracks.service';
+import { AlbumsService } from '../albums/albums.service';
 
 @ApiTags('artists')
 @Controller('artist')
@@ -30,6 +31,7 @@ export class ArtistsController {
   constructor(
     private readonly artistsService: ArtistsService,
     private readonly tracksService: TracksService,
+    private readonly albumsService: AlbumsService,
   ) {}
 
   @Get()
@@ -164,6 +166,7 @@ export class ArtistsController {
     }
     await this.artistsService.deleteArtist(artistId);
     await this.tracksService.removeArtistIdFromTrack(artistId);
+    await this.albumsService.removeArtistIdFromAlbum(artistId);
     res.status(StatusCodes.NO_CONTENT).send();
   }
 }

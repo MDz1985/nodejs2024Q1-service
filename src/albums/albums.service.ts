@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Album } from './common/interfaces/album.interface';
 import { CreateAlbumDto } from './common/dto/create-album.dto';
 import { UpdateAlbumDto } from './common/dto/update-album.dto';
+import { Track } from '../tracks/common/interfaces/track.interface';
 
 @Injectable()
 export class AlbumsService {
@@ -31,5 +32,14 @@ export class AlbumsService {
 
   async deleteAlbum(id: string): Promise<void> {
     this._albums = this._albums.filter((album) => album.id !== id);
+  }
+
+  async removeArtistIdFromAlbum(artistId: string) {
+    this._albums = this._albums.map((album: Album) => {
+      if (album.artistId === artistId) {
+        album.artistId = null;
+      }
+      return album;
+    });
   }
 }
