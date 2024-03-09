@@ -41,4 +41,13 @@ export class TracksService {
       return track;
     });
   }
+
+  async removeAlbumIdFromTrack(albumId: string) {
+    this._tracks = this._tracks.map((track: Track) => {
+      if (track.albumId === albumId) {
+        track.artistId = null;
+      }
+      return track;
+    });
+  }
 }
