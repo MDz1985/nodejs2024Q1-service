@@ -9,7 +9,7 @@ export class UsersService {
   private _users: any[] = [];
 
   getAllUsers(): any[] {
-    return this._users;
+    return this._users.map((user) => getUserWithoutPassword(user));
   }
 
   createUser(dto: CreateUserDto): Omit<User, 'password'> {

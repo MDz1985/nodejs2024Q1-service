@@ -17,21 +17,29 @@ import { validate } from 'uuid';
 import { UpdatePasswordDto } from './common/dto/update-password.dto';
 import {
   ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { USER_ERRORS } from './common/enums/errors.enum';
 
 @ApiTags('users')
 @Controller('user')
+@ApiResponse({
+  status: StatusCodes.INTERNAL_SERVER_ERROR,
+  description: 'Internal server error',
+})
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({
-    status: 200,
     description: 'Return the list of users',
     type: [User],
   })
@@ -41,21 +49,29 @@ export class UsersController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get user bu id' })
-  @ApiOkResponse({ status: 200, description: 'Return the user', type: User })
-  @ApiBadRequestResponse({ status: 400, description: 'Invalid userId' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOkResponse({
+    description: 'Return the user',
+    type: User,
+  })
+  @ApiBadRequestResponse({
+    description: USER_ERRORS.INVALID_ID,
+  })
+  @ApiNotFoundResponse({ description: 'User not found' })
   async getUserById(
     @Param('id') userId: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<User | { error: string }> {
     if (!validate(userId)) {
-      res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid userId' });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ error: USER_ERRORS.INVALID_ID });
       return;
     }
     const user: User = await this.usersService.getUserById(userId);
     if (!user) {
-      res.status(StatusCodes.NOT_FOUND).send({ error: 'User not found' });
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .send({ error: USER_ERRORS.USER_DOESNT_EXIST });
       return;
     }
     return user;
@@ -63,10 +79,13 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Create user' })
-  @ApiOkResponse({ status: 200, description: 'Return the user', type: User })
-  @ApiBadRequestResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 409, description: 'User already exists' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiCreatedResponse({
+    description: 'Return the user',
+    type: User,
+  })
+  @ApiBadRequestResponse({
+    description: USER_ERRORS.NOT_ALL_FIELDS,
+  })
   async createUser(
     @Body() dto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
@@ -78,7 +97,9 @@ export class UsersController {
       typeof dto?.login !== 'string' ||
       typeof dto?.password !== 'string'
     ) {
-      res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid data' });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ error: USER_ERRORS.NOT_ALL_FIELDS });
       return;
     }
     return this.usersService.createUser(dto);
@@ -86,10 +107,19 @@ export class UsersController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update user password' })
-  @ApiOkResponse({ status: 200, description: 'Return the user', type: User })
-  @ApiBadRequestResponse({ status: 400, description: 'Invalid userId' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOkResponse({
+    description: 'Return the user',
+    type: User,
+  })
+  @ApiBadRequestResponse({
+    description: USER_ERRORS.INVALID_ID,
+  })
+  @ApiNotFoundResponse({
+    description: USER_ERRORS.USER_DOESNT_EXIST,
+  })
+  @ApiForbiddenResponse({
+    description: USER_ERRORS.WRONG_OLD_PASSWORD,
+  })
   async updatePassword(
     @Param('id') userId: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
@@ -103,16 +133,22 @@ export class UsersController {
       updatePasswordDto === null ||
       Object.keys(updatePasswordDto)?.length !== 2
     ) {
-      res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid userId' });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ error: USER_ERRORS.INVALID_ID });
       return;
     }
     const user = await this.usersService.getUserById(userId);
     if (!user) {
-      res.status(StatusCodes.NOT_FOUND).send({ error: 'User not found' });
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .send({ error: USER_ERRORS.USER_DOESNT_EXIST });
       return;
     }
     if (user.password !== updatePasswordDto.oldPassword) {
-      res.status(StatusCodes.FORBIDDEN).send({ error: 'Wrong old password' });
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .send({ error: USER_ERRORS.WRONG_OLD_PASSWORD });
       return;
     }
     return await this.usersService.updateUser(user, updatePasswordDto);
@@ -120,21 +156,26 @@ export class UsersController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete user' })
-  @ApiOkResponse({ status: 204, description: 'User deleted' })
-  @ApiBadRequestResponse({ status: 400, description: 'Invalid userId' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiNoContentResponse({ description: 'User deleted' })
+  @ApiBadRequestResponse({
+    description: USER_ERRORS.INVALID_ID,
+  })
+  @ApiNotFoundResponse({ description: USER_ERRORS.USER_DOESNT_EXIST })
   async deleteUser(
     @Param('id') userId: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     if (!validate(userId)) {
-      res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid userId' });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ error: USER_ERRORS.INVALID_ID });
       return;
     }
     const user = await this.usersService.getUserById(userId);
     if (!user) {
-      res.status(StatusCodes.NOT_FOUND).send({ error: 'User not found' });
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .send({ error: USER_ERRORS.USER_DOESNT_EXIST });
       return;
     }
     await this.usersService.deleteUser(userId);
