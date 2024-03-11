@@ -17,7 +17,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { TracksService } from './tracks.service';
@@ -37,7 +36,7 @@ export class TracksController {
 
   @Get()
   @ApiOperation({ summary: 'Get all tracks' })
-  @ApiResponse({ status: 200, description: 'Return the list of tracks' })
+  @ApiOkResponse({ type: [Track], description: 'Return the list of tracks' })
   async getAllTracks() {
     return this.tracksService.getAllTracks();
   }
@@ -46,6 +45,7 @@ export class TracksController {
   @ApiOperation({ summary: 'Get single track by id' })
   @ApiParam({ name: 'id', description: 'Track ID' })
   @ApiOkResponse({
+    type: Track,
     description: 'Return the record with provided id',
   })
   @ApiBadRequestResponse({ description: TRACK_ERRORS.INVALID_ID })
@@ -74,7 +74,10 @@ export class TracksController {
 
   @Post()
   @ApiOperation({ summary: 'Create track' })
-  @ApiCreatedResponse({ description: 'Track created' })
+  @ApiCreatedResponse({
+    type: Track,
+    description: 'Track created',
+  })
   @ApiBadRequestResponse({ description: TRACK_ERRORS.TRACK_DOESNT_EXIST })
   async createTrack(
     @Body() dto: CreateTrackDto,
