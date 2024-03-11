@@ -3,17 +3,19 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Param,
   Post,
   Put,
   Res,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { ArtistsService } from './artists.service';
@@ -25,9 +27,13 @@ import { CreateArtistDto } from './common/dto/create-artist.dto';
 import { UpdateArtistDto } from './common/dto/update-artist.dto';
 import { TracksService } from '../tracks/tracks.service';
 import { AlbumsService } from '../albums/albums.service';
+import { ARTIST_ERRORS } from './common/enums/errors.enum';
 
 @ApiTags('artists')
 @Controller('artist')
+@ApiInternalServerErrorResponse({
+  description: 'Internal server error',
+})
 export class ArtistsController {
   constructor(
     private readonly artistsService: ArtistsService,
@@ -37,8 +43,8 @@ export class ArtistsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all artists' })
-  @ApiResponse({
-    status: StatusCodes.OK,
+  @ApiOkResponse({
+    type: [Artist],
     description: 'Return the list of artists',
   })
   getAllArtists(): Promise<Artist[]> {
@@ -48,25 +54,31 @@ export class ArtistsController {
   @Get(':id')
   @ApiParam({ name: 'id', type: String })
   @ApiOperation({ summary: 'Get an artist by id' })
-  @ApiResponse({
-    status: StatusCodes.OK,
+  @ApiOkResponse({
+    type: Artist,
     description: 'Return the artist with the specified id',
   })
-  @ApiResponse({
-    status: StatusCodes.NOT_FOUND,
-    description: 'Artist not found',
+  @ApiBadRequestResponse({
+    description: ARTIST_ERRORS.INVALID_ID,
+  })
+  @ApiNotFoundResponse({
+    description: ARTIST_ERRORS.ARTIST_DOESNT_EXIST,
   })
   async getArtistById(
     @Param('id') artistId: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Artist> {
     if (!validate(artistId)) {
-      res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid artistId' });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ error: ARTIST_ERRORS.INVALID_ID });
       return;
     }
     const artist = await this.artistsService.getArtistById(artistId);
     if (!artist) {
-      res.status(StatusCodes.NOT_FOUND).send({ error: 'Artist not found' });
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .send({ error: ARTIST_ERRORS.ARTIST_DOESNT_EXIST });
       return;
     }
     return artist;
@@ -74,10 +86,11 @@ export class ArtistsController {
 
   @Post()
   @ApiOperation({ summary: 'Create artist' })
-  @ApiResponse({ status: 201, description: 'Artist created' })
-  @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 409, description: 'Artist already exists' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiCreatedResponse({
+    type: Artist,
+    description: 'Artist created',
+  })
+  @ApiBadRequestResponse({ description: ARTIST_ERRORS.NOT_ALL_FIELDS })
   async createArtist(
     @Body() dto: CreateArtistDto,
     @Res({ passthrough: true }) res: Response,
@@ -101,18 +114,16 @@ export class ArtistsController {
   @Put(':id')
   @ApiParam({ name: 'id', type: String })
   @ApiOperation({ summary: 'Update an artist by id' })
-  @ApiResponse({
-    status: StatusCodes.OK,
+  @ApiOkResponse({
     description: 'Artist updated successfully',
     type: Artist,
   })
-  @ApiResponse({
+  @ApiNotFoundResponse({
     status: StatusCodes.NOT_FOUND,
-    description: 'Artist not found',
+    description: ARTIST_ERRORS.INVALID_ID,
   })
-  @ApiResponse({
-    status: StatusCodes.BAD_REQUEST,
-    description: 'Invalid artist data',
+  @ApiBadRequestResponse({
+    description: ARTIST_ERRORS.NOT_ALL_FIELDS,
   })
   async updateArtist(
     @Param('id') artistId: string,
@@ -126,12 +137,14 @@ export class ArtistsController {
     ) {
       res
         .status(StatusCodes.BAD_REQUEST)
-        .send({ error: 'Invalid artist data' });
+        .send({ error: ARTIST_ERRORS.INVALID_ID });
       return;
     }
     const artist = await this.artistsService.getArtistById(artistId);
     if (!artist) {
-      res.status(StatusCodes.NOT_FOUND).send({ error: 'Artist not found' });
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .send({ error: ARTIST_ERRORS.ARTIST_DOESNT_EXIST });
       return;
     }
     return await this.artistsService.updateArtist(artistId, updateArtistDto);
@@ -141,28 +154,30 @@ export class ArtistsController {
   @ApiParam({ name: 'id', type: String })
   @ApiOperation({ summary: 'Delete an artist by id' })
   @ApiOkResponse({
-    status: StatusCodes.OK,
     description: 'Artist deleted successfully',
   })
-  @ApiResponse({
+  @ApiNotFoundResponse({
     status: StatusCodes.NOT_FOUND,
-    description: 'Artist not found',
+    description: ARTIST_ERRORS.ARTIST_DOESNT_EXIST,
   })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
+  @ApiBadRequestResponse({
+    description: ARTIST_ERRORS.INVALID_ID,
   })
   async deleteArtist(
     @Param('id') artistId: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     if (!validate(artistId)) {
-      res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid artistId' });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ error: ARTIST_ERRORS.INVALID_ID });
       return;
     }
     const artist = await this.artistsService.getArtistById(artistId);
     if (!artist) {
-      res.status(StatusCodes.NOT_FOUND).send({ error: 'Artist not found' });
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .send({ error: ARTIST_ERRORS.ARTIST_DOESNT_EXIST });
       return;
     }
     await this.artistsService.deleteArtist(artistId);

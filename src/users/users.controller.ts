@@ -19,19 +19,18 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { USER_ERRORS } from './common/enums/errors.enum';
 
 @ApiTags('users')
 @Controller('user')
-@ApiResponse({
-  status: StatusCodes.INTERNAL_SERVER_ERROR,
+@ApiInternalServerErrorResponse({
   description: 'Internal server error',
 })
 export class UsersController {
