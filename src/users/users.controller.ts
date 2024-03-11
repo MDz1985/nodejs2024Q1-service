@@ -30,9 +30,7 @@ import { USER_ERRORS } from './common/enums/errors.enum';
 
 @ApiTags('users')
 @Controller('user')
-@ApiInternalServerErrorResponse({
-  description: 'Internal server error',
-})
+@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
