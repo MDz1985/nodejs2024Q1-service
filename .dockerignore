@@ -1,0 +1,28 @@
+# macOS system files
+.DS_Store
+
+# WebStorm project files
+.idea/
+*.iml
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Node modules
+node_modules/
+
+# Dependency directories
+bower_components/
+vendor/
+
+# Output of compilers
+dist/
+out/
+build/
+*.tmp
+*.temp
+
+# Version control
+.git/
