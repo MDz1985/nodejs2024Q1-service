@@ -18,9 +18,8 @@ bower_components/
 vendor/
 
 # Output of compilers
+docker/
 dist/
-out/
-build/
 *.tmp
 *.temp
 
