@@ -18,6 +18,6 @@ async function bootstrap() {
   SwaggerModule.setup('doc', app, document);
 
   await app.listen(PORT);
-  console.log(PORT, 'ff');
+  console.log(PORT);
 }
 bootstrap();
