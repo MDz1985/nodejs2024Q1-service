@@ -16,10 +16,38 @@ datasource db {
 }
 
 model User {
-  id        String   @id @unique
+  id        String   @id @default(uuid())
   login     String
   password  String
   version   Int
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model Artist {
+  id     String  @id @default(uuid())
+  name   String
+  grammy Boolean
+}
+
+model Album {
+  id       String  @id @default(uuid())
+  name     String
+  year     Int
+  artistId String? @map("artist_id") // refers to Artist
+}
+
+model Track {
+  id       String  @id @default(uuid())
+  name     String
+  artistId String? @map("artist_id") // refers to Artist
+  albumId  String? @map("album_id") // refers to Album
+  duration Int
+}
+
+model Favorites {
+  id      Int      @id @default(autoincrement())
+  artists String[]
+  albums  String[]
+  tracks  String[]
 }
