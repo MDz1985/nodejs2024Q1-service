@@ -6,15 +6,15 @@ services:
       context: .
       dockerfile: db/Dockerfile
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-#      DATABASE_URL: postgresql://myuser:mypassword@db:5432/mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+      DATABASE_URL: postgresql://myuser:mypassword@mydatabase:5432/mydatabase
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - postgres-logs:/var/log/postgresql
     ports:
-      - "${PORT_DB}:${PORT_DB}"
+      - "5432:5432"
     networks:
       - bridge-network
     env_file:
@@ -24,12 +24,16 @@ services:
   nextjs:
     restart: always
     container_name: nextJs
-    image: mdz1985/nodejs2024q1-service-nextjs
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - PORT=${PORT}
     ports:
       - "${PORT}:${PORT}"
     volumes:
       - ./src:/app/src
-      - node_modules:/app/node_modules
+      - node_modules_volume:/app/node_modules
     environment:
       - NODE_ENV=development
     networks:
@@ -43,7 +47,7 @@ volumes:
     driver: local
   postgres-logs:
     driver: local
-  node_modules:
+  node_modules_volume:
     driver: local
   src_volume:
     driver: local

@@ -21,6 +21,7 @@ vendor/
 #prisma/
 docker/
 dist/
+test/
 *.tmp
 *.temp
 
