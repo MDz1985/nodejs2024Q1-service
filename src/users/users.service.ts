@@ -4,16 +4,19 @@ import { User } from './common/interfaces/user.interface';
 import { UpdatePasswordDto } from './common/dto/update-password.dto';
 import { getUserWithoutPassword } from './common/helpers/user.helper';
 import { PrismaService } from '../prisma/prisma.service';
-import { getDataWithDateAsDate, getDataWithDateAsNumber } from '../common/helpers/helpers';
+import {
+  getDataWithDateAsDate,
+  getDataWithDateAsNumber,
+} from '../common/helpers/helpers';
 
 @Injectable()
 export class UsersService {
-  private _users: any[] = [];
+  // private _users: any[] = [];
 
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly _prisma: PrismaService) {}
 
   async getAllUsers() {
-    const users = await this.prisma.user.findMany({
+    const users = await this._prisma.user.findMany({
       select: {
         id: true,
         login: true,
@@ -36,7 +39,7 @@ export class UsersService {
     const user: User = new User(dto);
     // this._users.push(user);
 
-    return this.prisma.user
+    return this._prisma.user
       .create({
         data: getDataWithDateAsDate<User>(user),
       })
@@ -46,22 +49,29 @@ export class UsersService {
   }
 
   async getUserById(userId: string): Promise<User | null> {
-    return this.prisma.user.findUnique({
-      where: { id: userId, },
-    }).then((user)=> user ? getDataWithDateAsNumber<User>(user) : null);
+    return this._prisma.user
+      .findUnique({
+        where: { id: userId },
+      })
+      .then((user) => (user ? getDataWithDateAsNumber<User>(user) : null));
   }
 
   async updateUser(user: User, dto: UpdatePasswordDto) {
     user.password = dto.newPassword;
     user.updatedAt = Date.now();
     user.version += 1;
-    return this.prisma.user.update({where: {id: user.id}, data: getDataWithDateAsDate<User>(user)}).then(
-      (user) => getUserWithoutPassword(getDataWithDateAsNumber<User>(user)),
-    )
+    return this._prisma.user
+      .update({
+        where: { id: user.id },
+        data: getDataWithDateAsDate<User>(user),
+      })
+      .then((user) =>
+        getUserWithoutPassword(getDataWithDateAsNumber<User>(user)),
+      );
   }
 
   async deleteUser(userId: string): Promise<void> {
-    await this.prisma.user.delete({ where: { id: userId } });
+    await this._prisma.user.delete({ where: { id: userId } });
     // this._users = this._users.filter((user: User) => user.id !== userId);
   }
 }

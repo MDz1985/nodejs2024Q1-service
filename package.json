@@ -21,8 +21,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "docker:compose": "docker compose up -d",
-    "docker:prisma": "docker exec nextJs npx prisma migrate dev --name init",
-    "docker:start": "npm run docker:compose & npm run docker:prisma"
+    "docker:prisma:migrate": "docker exec nextJs npx prisma migrate dev --name init",
+    "docker:start": "npm run docker:compose & npm run docker:prisma",
+    "docker:remove-images": "docker image rm -f $(docker image ls -q)",
+    "docker:remove-containers": "docker container rm -f $( docker container ls -a)",
+    "docker:clean": "npm run docker:remove-images & npm run docker:remove-containers",
+    "trivy": "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image nodejs2024q1-service-nextjs --scanners vuln"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.3",

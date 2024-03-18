@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN ls
-
 RUN npm i
 
 COPY . .
@@ -17,7 +15,7 @@ EXPOSE ${PORT}
 #ENV NODE_ENV=development
 
 #VOLUME ["/app/src", "/app/node_modules"]
-#RUN npx prisma generate
+RUN npx prisma generate
 #RUN npx prisma migrate dev --name init
 
 CMD ["npm", "run", "start:dev"]
