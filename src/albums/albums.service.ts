@@ -42,7 +42,7 @@ export class AlbumsService {
   }
 
   async removeArtistIdFromAlbum(artistId: string) {
-    this._prisma.album.updateMany({
+    await this._prisma.album.updateMany({
       where: { artistId },
       data: {
         artistId: null,

@@ -163,7 +163,7 @@ export class FavoritesController {
   })
   async deleteAlbumFromFavorites(
     @Param('id') albumId: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
     if (!validate(albumId)) {
       res
@@ -232,7 +232,7 @@ export class FavoritesController {
   })
   async deleteArtistFromFavorites(
     @Param('id') artistId: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
     if (!validate(artistId)) {
       res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid artistId' });
