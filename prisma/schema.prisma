@@ -12,7 +12,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // url      = "postgresql://myuser:mypassword@localhost:5432/mydatabase?schema=public"
 }
 
 model User {
@@ -22,12 +21,17 @@ model User {
   version   Int      @default(1)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @db.Timestamptz(3)
+
+  // todo: connect favorites to User when it will be possible
+  //   favorites Favorites?
 }
 
 model Artist {
   id     String  @id @default(uuid())
   name   String
   grammy Boolean
+
+  tracks Track[]
 }
 
 model Album {
@@ -35,18 +39,29 @@ model Album {
   name     String
   year     Int
   artistId String? @map("artist_id") // refers to Artist
+
+  tracks Track[]
 }
 
 model Track {
   id       String  @id @default(uuid())
   name     String
-  artistId String? @map("artist_id") // refers to Artist
-  albumId  String? @map("album_id") // refers to Album
+  artistId String? @unique
+  albumId  String? @unique
+  // artistId String? @map("artist_id") // refers to Artist
+  // albumId  String? @map("album_id") // refers to Album
   duration Int
+
+  artist Artist? @relation(fields: [artistId], references: [id])
+  album  Album?  @relation(fields: [albumId], references: [id])
 }
 
 model Favorites {
-  id      Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+  // todo: connect Favorites to User when it will be possible (use userId instead of id)
+  //   userId String @unique
+  // user   User   @relation(fields: [userId], references: [id])
+
   artists String[] @default([])
   albums  String[] @default([])
   tracks  String[] @default([])

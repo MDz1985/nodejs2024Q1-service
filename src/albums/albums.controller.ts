@@ -168,7 +168,7 @@ export class AlbumsController {
       return;
     }
     await this.albumsService.deleteAlbum(albumId);
-    await this.tracksService.removeAlbumIdFromTrack(albumId);
+    // await this.tracksService.removeAlbumIdFromTrack(albumId);
     res.status(StatusCodes.NO_CONTENT).send();
     return;
   }
