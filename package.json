@@ -26,6 +26,7 @@
     "docker:prisma:generate": "docker exec nextJs npx prisma generate",
     "docker:logs": "docker logs -f nextJs",
     "docker:start": "npm run docker:compose:hub && npm run docker:prisma:migrate && npm run docker:logs",
+    "docker:start:test": "npm run docker:compose:hub && npm run docker:prisma:migrate && npm run test",
     "docker:start:local": "npm run docker:compose:local && npm run docker:prisma:migrate",
     "docker:remove-images": "docker image rm -f $(docker image ls -q)",
     "docker:remove-containers": "docker container rm -f $( docker container ls -a)",
