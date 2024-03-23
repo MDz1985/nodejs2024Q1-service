@@ -25,7 +25,6 @@ import { validate } from 'uuid';
 import { Response } from 'express';
 import { CreateAlbumDto } from './common/dto/create-album.dto';
 import { UpdateAlbumDto } from './common/dto/update-album.dto';
-import { TracksService } from '../tracks/tracks.service';
 import { ALBUM_ERRORS } from './common/enums/errors.enum';
 
 @ApiTags('albums')
@@ -34,10 +33,7 @@ import { ALBUM_ERRORS } from './common/enums/errors.enum';
   description: 'Internal server error',
 })
 export class AlbumsController {
-  constructor(
-    private readonly albumsService: AlbumsService,
-    private readonly tracksService: TracksService,
-  ) {}
+  constructor(private readonly albumsService: AlbumsService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all albums' })

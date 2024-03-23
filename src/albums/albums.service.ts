@@ -6,7 +6,6 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AlbumsService {
-
   constructor(private readonly _prisma: PrismaService) {}
 
   async getAllAlbums(): Promise<Album[]> {

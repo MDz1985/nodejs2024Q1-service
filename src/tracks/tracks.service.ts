@@ -6,8 +6,6 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TracksService {
-  // private _tracks: Track[] = [];
-
   constructor(private readonly _prisma: PrismaService) {}
 
   async getAllTracks(): Promise<Track[]> {
@@ -16,28 +14,19 @@ export class TracksService {
 
   async getTrackById(id: string): Promise<Track | undefined> {
     return this._prisma.track.findUnique({ where: { id } });
-    // return this._tracks.find((track) => track.id === id);
   }
 
   async createTrack(dto: CreateTrackDto): Promise<Track> {
     const track = new Track(dto);
     return this._prisma.track.create({ data: track });
-    // this._tracks.push(track);
-    // return track;
   }
 
   async updateTrack(id: string, dto: UpdateTrackDto): Promise<Track> {
     return this._prisma.track.update({ where: { id }, data: dto });
-    // const track = this.getTrackById(id);
-    // if (track) {
-    //   Object.assign(track, dto);
-    // }
-    // return track;
   }
 
   async deleteTrack(id: string): Promise<void> {
     await this._prisma.track.delete({ where: { id } });
-    // this._tracks = this._tracks.filter((track) => track.id !== id);
   }
 
   async removeArtistIdFromTrack(artistId: string): Promise<void> {

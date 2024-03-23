@@ -32,15 +32,18 @@ model Artist {
   grammy Boolean
 
   tracks Track[]
+  albums Album[]
 }
 
 model Album {
   id       String  @id @default(uuid())
   name     String
   year     Int
-  artistId String? @map("artist_id") // refers to Artist
+  artistId String? @unique
+  // artistId String? @map("artist_id") // refers to Artist
 
-  tracks Track[]
+  tracks  Track[]
+  artists Artist? @relation(fields: [artistId], references: [id])
 }
 
 model Track {

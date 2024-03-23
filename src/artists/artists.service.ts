@@ -6,8 +6,8 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ArtistsService {
-
   constructor(private readonly _prisma: PrismaService) {}
+
   async getAllArtists(): Promise<Artist[]> {
     return this._prisma.artist.findMany();
   }
