@@ -40,7 +40,6 @@ model Album {
   name     String
   year     Int
   artistId String? @unique
-  // artistId String? @map("artist_id") // refers to Artist
 
   tracks  Track[]
   artists Artist? @relation(fields: [artistId], references: [id])
@@ -51,8 +50,6 @@ model Track {
   name     String
   artistId String? @unique
   albumId  String? @unique
-  // artistId String? @map("artist_id") // refers to Artist
-  // albumId  String? @map("album_id") // refers to Album
   duration Int
 
   artist Artist? @relation(fields: [artistId], references: [id])
@@ -60,7 +57,7 @@ model Track {
 }
 
 model Favorites {
-  id Int @id @default(autoincrement())
+  id Int @id @default(1)
   // todo: connect Favorites to User when it will be possible (use userId instead of id)
   //   userId String @unique
   // user   User   @relation(fields: [userId], references: [id])

@@ -1,44 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { Favorites } from './common/interfaces/favorites.interface';
 import { StatusCodes } from 'http-status-codes';
-import { Track } from '../tracks/common/interfaces/track.interface';
-import { Album } from '../albums/common/interfaces/album.interface';
-import { Artist } from '../artists/common/interfaces/artist.interface';
 import { PrismaService } from '../prisma/prisma.service';
+import { Album, Artist, Favorites, Track } from '@prisma/client';
 
 @Injectable()
 export class FavoritesService {
-  // private _favorites: Favorites = new Favorites();
-
   constructor(private readonly _prisma: PrismaService) {
     this.init();
   }
 
-  async getFavorites(
-    allTracks: Track[],
-    allAlbums: Album[],
-    allArtists: Artist[],
-  ) {
+  async getFavorites() {
     const favorites: Favorites = await this._prisma.favorites.findFirst();
-    const tracks = await this._prisma.track.findMany({
+    const tracks: Track[] = await this._prisma.track.findMany({
       where: { id: { in: favorites.tracks } },
     });
-    const albums = await this._prisma.album.findMany({
+    const albums: Album[] = await this._prisma.album.findMany({
       where: { id: { in: favorites.albums } },
     });
-    const artists = await this._prisma.artist.findMany({
+    const artists: Artist[] = await this._prisma.artist.findMany({
       where: { id: { in: favorites.artists } },
     });
-
-    // const tracks = allTracks.filter((track) =>
-    //   this._favorites.tracks.includes(track.id),
-    // );
-    // const albums = allAlbums.filter((album) =>
-    //   this._favorites.albums.includes(album.id),
-    // );
-    // const artists = allArtists.filter((artist) =>
-    //   this._favorites.artists.includes(artist.id),
-    // );
     return {
       tracks: tracks || [],
       albums: albums || [],
@@ -51,11 +32,10 @@ export class FavoritesService {
       where: { id: 1 },
       data: { tracks: { push: trackId } },
     });
-    // this._favorites.tracks.push(trackId);
   }
 
   async deleteTrackFromFavorites(trackId: string) {
-    const favorites = await this._prisma.favorites.findFirst();
+    const favorites: Favorites = await this._prisma.favorites.findFirst();
     try {
       await this._prisma.favorites.update({
         where: { id: favorites.id },
@@ -67,13 +47,6 @@ export class FavoritesService {
     } catch {
       return StatusCodes.NOT_FOUND;
     }
-    // if (!this._favorites.tracks.includes(trackId)) {
-    //   return StatusCodes.NOT_FOUND;
-    // }
-    // this._favorites.tracks = this._favorites.tracks.filter(
-    //   (track) => track !== trackId,
-    // );
-    // return StatusCodes.NO_CONTENT;
   }
 
   async addAlbumToFavorites(albumId: string): Promise<void> {
@@ -81,11 +54,10 @@ export class FavoritesService {
       where: { id: 1 },
       data: { albums: { push: albumId } },
     });
-    // this._favorites.albums.push(albumId);
   }
 
-  async deleteAlbumFromFavorites(albumId: string) {
-    const favorites = await this._prisma.favorites.findFirst();
+  async deleteAlbumFromFavorites(albumId: string): Promise<StatusCodes> {
+    const favorites: Favorites = await this._prisma.favorites.findFirst();
     try {
       await this._prisma.favorites.update({
         where: { id: 1 },
@@ -97,25 +69,17 @@ export class FavoritesService {
     } catch {
       return StatusCodes.NOT_FOUND;
     }
-    // if (!this._favorites.albums.includes(albumId)) {
-    //   return StatusCodes.NOT_FOUND;
-    // }
-    // this._favorites.albums = this._favorites.albums.filter(
-    //   (album) => album !== albumId,
-    // );
-    // return StatusCodes.NO_CONTENT;
   }
 
-  async addArtistToFavorites(artistId: string) {
+  async addArtistToFavorites(artistId: string): Promise<void> {
     await this._prisma.favorites.update({
       where: { id: 1 },
       data: { artists: { push: artistId } },
     });
-    // this._favorites.artists.push(artistId);
   }
 
-  async deleteArtistFromFavorites(artistId: string) {
-    const favorites = await this._prisma.favorites.findFirst();
+  async deleteArtistFromFavorites(artistId: string): Promise<StatusCodes> {
+    const favorites: Favorites = await this._prisma.favorites.findFirst();
     try {
       await this._prisma.favorites.update({
         where: { id: favorites?.id },
@@ -127,22 +91,18 @@ export class FavoritesService {
     } catch {
       return StatusCodes.NOT_FOUND;
     }
-    // if (!this._favorites.artists.includes(artistId)) {
-    //   return StatusCodes.NOT_FOUND;
-    // }
-    // this._favorites.artists = this._favorites.artists.filter(
-    //   (artist) => artist !== artistId,
-    // );
-    // return StatusCodes.NO_CONTENT;
   }
 
-  private init() {
-    this._prisma.favorites.create({
-      data: {
-        tracks: [],
-        albums: [],
-        artists: [],
-      },
-    });
+  private async init(): Promise<void> {
+    const favorites: Favorites = await this._prisma.favorites.findFirst();
+    if (!favorites?.id) {
+      await this._prisma.favorites.create({
+        data: {
+          tracks: [],
+          albums: [],
+          artists: [],
+        },
+      });
+    }
   }
 }

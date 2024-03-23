@@ -38,14 +38,7 @@ export class FavoritesController {
     description: 'Return the list of favorites',
   })
   async getFavorites() {
-    const tracks = await this.tracksService.getAllTracks();
-    const albums = await this.albumsService.getAllAlbums();
-    const artists = await this.artistsService.getAllArtists();
-    return this.favoritesService.getFavorites(
-      tracks ?? [],
-      albums ?? [],
-      artists ?? [],
-    );
+    return this.favoritesService.getFavorites();
   }
 
   @Post('track/:id')
