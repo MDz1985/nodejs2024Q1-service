@@ -16,7 +16,7 @@ git clone https://github.com/MDz1985/nodejs2024Q1-service.git
 cd nodejs2024Q1-service
 ```
 
-### 2) Switch branch:
+### 2) Switch branch to `Home_library_Service_Part_2`:
 ```bash
 git checkout Home_library_Service_Part_2
 ```
