@@ -71,7 +71,7 @@ export class FavoritesController {
       });
       return;
     }
-    this.favoritesService.addTrackToFavorites(trackId);
+    await this.favoritesService.addTrackToFavorites(trackId);
     return track;
   }
 
@@ -89,8 +89,8 @@ export class FavoritesController {
   })
   async deleteTrackFromFavorites(
     @Param('id') trackId: string,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+    @Res() res: Response,
+  ): Promise<void> {
     if (!validate(trackId)) {
       res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid trackId' });
       return;
@@ -139,7 +139,7 @@ export class FavoritesController {
       });
       return;
     }
-    this.favoritesService.addAlbumToFavorites(albumId);
+    await this.favoritesService.addAlbumToFavorites(albumId);
   }
 
   @Delete('album/:id')
@@ -157,7 +157,7 @@ export class FavoritesController {
   async deleteAlbumFromFavorites(
     @Param('id') albumId: string,
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     if (!validate(albumId)) {
       res
         .status(StatusCodes.BAD_REQUEST)
@@ -193,7 +193,7 @@ export class FavoritesController {
   async addArtistToFavorites(
     @Param('id') artistId: string,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<void> {
     if (!validate(artistId)) {
       res.status(StatusCodes.BAD_REQUEST).send({
         error: FAVORITES_ERRORS.INVALID_ID,
@@ -208,7 +208,7 @@ export class FavoritesController {
       });
       return;
     }
-    this.favoritesService.addArtistToFavorites(artistId);
+    await this.favoritesService.addArtistToFavorites(artistId);
   }
 
   @Delete('artist/:id')
@@ -226,7 +226,7 @@ export class FavoritesController {
   async deleteArtistFromFavorites(
     @Param('id') artistId: string,
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     if (!validate(artistId)) {
       res.status(StatusCodes.BAD_REQUEST).send({ error: 'Invalid artistId' });
       return;

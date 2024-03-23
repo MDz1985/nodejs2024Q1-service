@@ -159,7 +159,7 @@ export class ArtistsController {
   })
   async deleteArtist(
     @Param('id') artistId: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ): Promise<void> {
     if (!validate(artistId)) {
       res
