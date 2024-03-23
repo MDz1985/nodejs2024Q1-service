@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './common/dto/create-user.dto';
-import { User } from './common/interfaces/user.interface';
+import {
+  User,
+  UserWithoutPassword,
+  UserWithStringDates,
+} from './common/interfaces/user.interface';
 import { UpdatePasswordDto } from './common/dto/update-password.dto';
 import { getUserWithoutPassword } from './common/helpers/user.helper';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  getDataWithDateAsDate,
   getDataWithDateAsNumber,
+  getDateAsString,
 } from '../common/helpers/helpers';
 
 @Injectable()
@@ -32,19 +36,17 @@ export class UsersService {
         updatedAt: new Date(user.updatedAt).getTime(),
       };
     });
-    // return this._users.map((user) => getUserWithoutPassword(user));
   }
 
-  async createUser(dto: CreateUserDto): Promise<Omit<User, 'password'>> {
-    const user: User = new User(dto);
-    // this._users.push(user);
-
+  async createUser(dto: CreateUserDto): Promise<UserWithoutPassword> {
     return this._prisma.user
       .create({
-        data: getDataWithDateAsDate<User>(user),
+        data: dto,
       })
-      .then((user) => {
-        return getUserWithoutPassword(getDataWithDateAsNumber<User>(user));
+      .then((user: UserWithStringDates) => {
+        return getUserWithoutPassword(
+          getDataWithDateAsNumber<UserWithStringDates>(user),
+        );
       });
   }
 
@@ -53,25 +55,32 @@ export class UsersService {
       .findUnique({
         where: { id: userId },
       })
-      .then((user) => (user ? getDataWithDateAsNumber<User>(user) : null));
+      .then((user: UserWithStringDates) =>
+        user ? getDataWithDateAsNumber<User>(user) : null,
+      );
   }
 
-  async updateUser(user: User, dto: UpdatePasswordDto) {
-    user.password = dto.newPassword;
-    user.updatedAt = Date.now();
-    user.version += 1;
+  async updateUser(
+    id: string,
+    dto: UpdatePasswordDto,
+  ): Promise<UserWithoutPassword> {
     return this._prisma.user
       .update({
-        where: { id: user.id },
-        data: getDataWithDateAsDate<User>(user),
+        where: { id },
+        data: {
+          password: dto.newPassword,
+          version: { increment: 1 },
+          updatedAt: getDateAsString(Date.now()),
+        },
       })
-      .then((user) =>
-        getUserWithoutPassword(getDataWithDateAsNumber<User>(user)),
+      .then((user: UserWithStringDates) =>
+        getUserWithoutPassword(
+          getDataWithDateAsNumber<UserWithStringDates>(user),
+        ),
       );
   }
 
   async deleteUser(userId: string): Promise<void> {
     await this._prisma.user.delete({ where: { id: userId } });
-    // this._users = this._users.filter((user: User) => user.id !== userId);
   }
 }

@@ -32,7 +32,7 @@ services:
     ports:
       - "${PORT}:${PORT}"
     volumes:
-      - ./src:/app/src
+      - .:/app
       - node_modules_volume:/app/node_modules
     environment:
       - NODE_ENV=development

@@ -19,7 +19,7 @@ model User {
   id        String   @id @default(uuid())
   login     String
   password  String
-  version   Int
+  version   Int      @default(1)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @db.Timestamptz(3)
 }

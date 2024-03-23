@@ -149,7 +149,7 @@ export class UsersController {
         .send({ error: USER_ERRORS.WRONG_OLD_PASSWORD });
       return;
     }
-    return await this.usersService.updateUser(user, updatePasswordDto);
+    return await this.usersService.updateUser(user.id, updatePasswordDto);
   }
 
   @Delete(':id')
