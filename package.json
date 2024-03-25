@@ -37,7 +37,7 @@
     "docker:remove-stopped-volumes": "docker system prune -a --volumes",
     "docker:remove-volumes": "docker volume rm $(docker volume ls -q)",
     "docker:clean": "npm run docker:stop && npm run docker:remove-images && npm run docker:remove-containers && npm run docker:remove-volumes",
-    "docker:clean-up-all": "npm run docker:stop&& npm run docker:remove-stopped-volumes && npm run docker:remove-volumes || true",
+    "docker:clean-up-all": "(npm run docker:stop || true) && (npm run docker:remove-stopped-volumes || true) && (npm run docker:remove-volumes || true)",
     "docker:scan": "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mdz1985/nodejs2024q1-service-nextjs --scanners vuln",
     "docker:tag": "docker tag nodejs2024q1-service-nextjs mdz1985/nodejs2024q1-service-nextjs",
     "docker:push-to-hub": "docker push mdz1985/nodejs2024q1-service-nextjs",
