@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-### ⚠️You need to have a good internet connection.
+### ⚠️ You need to have a good internet connection.
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
@@ -37,7 +37,7 @@ npm run docker:clean-up
 npm run docker:start
 ```
 ### 6) Start tests:
-⚠️When you receive a message with `4000 port is running` you may open new terminal window or stop current process using `ctrl + c` and 
+⚠️ When you receive a message with `4000 port is running` you may open new terminal window or stop current process using `ctrl + c` and 
 then use:  
 ```bash
 npm run test
@@ -69,6 +69,7 @@ ___
 
 ### Prisma configuration placed here:
 - `./prisma/schema.prisma`
+⚠️ You can see the prisma relations in the `./prisma/schema.prisma`
 ___
 
 # Additional information from previous part: 
