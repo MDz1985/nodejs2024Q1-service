@@ -28,10 +28,12 @@ npm i
 ```
 ### 4) Run docker (install and run the docker app for your OS)
 ### 4.1) Clean up the docker 
-⚠️ It is highly recommended to remove all docker containers and images before checking. If you don't suggested please skip this step
+⚠️ It is highly recommended to remove all docker containers, images and volumes before checking.
 ```bash
-npm run docker:clean-up
+npm run docker:clean-up-all
 ```
+- You will be asked `Are you sure you want to continue? [y/N]`
+- Please enter `y` in the console and press `Enter`
 ### 5) Start current app:
 ```bash
 npm run docker:start
@@ -51,6 +53,7 @@ npm run docker:logs
    error ) - in the logs you will see, that changes applies 
 
 ### 9) Scan image for vulnerabilities
+It needs some time to scan the image. Please wait before the process will be finished.
 ```bash
 npm run docker:scan
 ```
