@@ -10,6 +10,7 @@ RUN npm i
 
 COPY . .
 
+# to show you, that the port used from env and it is not 5000
 ARG PORT=5000
 ENV PORT ${PORT}
 EXPOSE ${PORT}

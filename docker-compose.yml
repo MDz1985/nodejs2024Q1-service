@@ -9,10 +9,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-#      DATABASE_URL: postgresql://myuser:mypassword@db:5432/mydatabase
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - postgres-logs:/var/log/postgresql
+      - postgres-data:${POSTGRES_DATA_VOLUME}
+      - postgres-logs:${POSTGRES_LOGS_VOLUME}
     ports:
       - "${PORT_DB}:${PORT_DB}"
     networks:
@@ -23,16 +22,16 @@ services:
 
   nextjs:
     restart: always
-    container_name: nextJs
-    image: mdz1985/nodejs2024q1-service-nextjs
+    container_name: ${APP_CONTAINER_NAME}
+    image: ${APP_IMAGE}
     ports:
       - "${PORT}:${PORT}"
     volumes:
-      - ./src:/app/src
-      - ./prisma/schema.prisma:/app/prisma/schema.prisma
-      - node_modules:/app/node_modules
+      - ${APP_SRC_SEARCH_VOLUME}
+      - ${APP_PRISMA_SCHEMA_SEARCH_VOLUME}
+      - node_modules:${APP_NODE_MODULES_VOLUME}
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV}
     networks:
       - bridge-network
     env_file:
@@ -41,13 +40,11 @@ services:
 
 volumes:
   postgres-data:
-    driver: local
+    driver: ${VOLUMES_DRIVER}
   postgres-logs:
-    driver: local
+    driver: ${VOLUMES_DRIVER}
   node_modules:
-    driver: local
-  src_volume:
-    driver: local
+    driver: ${VOLUMES_DRIVER}
 
 
 
