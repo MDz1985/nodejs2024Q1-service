@@ -4,6 +4,8 @@
 
 ## Prerequisites
 
+### ⚠️You need to have a good internet connection.
+
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
 - Docker - [Download $ Install Docker](https://www.docker.com/products/docker-desktop/)
@@ -24,22 +26,51 @@ git checkout Home_library_Service_Part_2
 ```bash
 npm i
 ```
-### 4) Run docker (install and run the docker app for your OS) 
-### 5) Start current app and check the tests:
+### 4) Run docker (install and run the docker app for your OS)
+### 4.1) Clean up the docker 
+⚠️ It is highly recommended to remove all docker containers and images before checking. If you don't suggested please skip this step
 ```bash
-npm run docker:start:test
+npm run docker:clean-up
 ```
-   - if you prefer you can start the app with the command `npm run docker:start` (so you can watch the logs for this app)
-   - then you can run tests in the separate terminal window or use 'ctrl + c' to stop logs. To start the tests use `npm run test`
-### 6) Show logs to test changes in the src directory
+### 5) Start current app:
+```bash
+npm run docker:start
+```
+### 6) Start tests:
+⚠️When you receive a message with `4000 port is running` you may open new terminal window or stop current process using `ctrl + c` and 
+then use:  
+```bash
+npm run test
+```
+### 7) Show logs to test changes in the src directory
 ```bash
 npm run docker:logs
 ```
-### 7) Test changes 
+### 8) Test changes 
    Make changes in any file in the `src` directory and save it (for example you can add the `console.log` or add changes to generate an 
    error ) - in the logs you will see, that changes applies 
 
+### 9) Scan image for vulnerabilities
+```bash
+npm run docker:scan
+```
 ___
+## Necessary information
+
+### I used next commands in this project, that was needed to complete the task:
+- ```npm run doocker:build``` to build the image
+- ```npm run docker:tag``` to tag the image
+- ```npm run docker:push-to-hub``` to push the image to the docker hub
+
+### Dockerfiles placed here:
+- `./Dockerfile` - for the NextJS app
+- `./db/Dockerfile` - for the Postgres database
+- `./docker-compose.yml` - for docker compose
+
+### Prisma configuration placed here:
+- `./prisma/schema.prisma`
+___
+
 # Additional information from previous part: 
 
 ## Downloading
