@@ -145,7 +145,7 @@ export class TracksController {
   @ApiNotFoundResponse({ description: TRACK_ERRORS.TRACK_DOESNT_EXIST })
   async deleteTrack(
     @Param('id') trackId: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ): Promise<void> {
     if (!validate(trackId)) {
       res
