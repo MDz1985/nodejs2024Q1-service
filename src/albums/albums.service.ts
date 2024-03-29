@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Album } from './common/interfaces/album.interface';
 import { CreateAlbumDto } from './common/dto/create-album.dto';
 import { UpdateAlbumDto } from './common/dto/update-album.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../services/prisma/prisma.service';
 
 @Injectable()
 export class AlbumsService {

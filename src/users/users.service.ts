@@ -7,7 +7,7 @@ import {
 } from './common/interfaces/user.interface';
 import { UpdatePasswordDto } from './common/dto/update-password.dto';
 import { getUserWithoutPassword } from './common/helpers/user.helper';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../services/prisma/prisma.service';
 import {
   getDataWithDateAsNumber,
   getDateAsString,
@@ -15,8 +15,6 @@ import {
 
 @Injectable()
 export class UsersService {
-  // private _users: any[] = [];
-
   constructor(private readonly _prisma: PrismaService) {}
 
   async getAllUsers() {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../services/prisma/prisma.service';
 import { Album, Artist, Favorites, Track } from '@prisma/client';
 
 @Injectable()
