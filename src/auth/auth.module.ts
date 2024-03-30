@@ -4,13 +4,15 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 
+const { REFRESH_TOKEN_EXPIRE_TIME, JWT_SECRET_KEY } = process.env;
+
 @Module({
   imports: [
     UsersModule,
     JwtModule.register({
-      secret: 'your_secret_key', // Replace with your secret key
+      secret: JWT_SECRET_KEY,
       signOptions: {
-        expiresIn: '15m', // Set the expiration time for the access token
+        expiresIn: REFRESH_TOKEN_EXPIRE_TIME,
       },
     }),
   ],
