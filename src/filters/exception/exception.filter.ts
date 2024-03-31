@@ -12,7 +12,6 @@ export class CustomExceptionFilter<T> implements ExceptionFilter {
   constructor(private readonly loggingService: LoggingService) {}
 
   catch(exception: T, host: ArgumentsHost) {
-    console.log(exception);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
@@ -25,9 +24,7 @@ export class CustomExceptionFilter<T> implements ExceptionFilter {
     const message =
       status === HttpStatus.INTERNAL_SERVER_ERROR
         ? 'Internal server error'
-        : (exception as HttpException).getResponse();
-
-    console.log(message, '###')
+        : (exception as HttpException).getResponse()['message'];
 
     this.loggingService.error(
       `HTTP ${status} Error: ${message}`,
@@ -38,6 +35,7 @@ export class CustomExceptionFilter<T> implements ExceptionFilter {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
+      message,
     });
   }
 }
