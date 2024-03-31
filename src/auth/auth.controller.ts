@@ -58,7 +58,15 @@ export class AuthController {
         .send({ error: USER_ERRORS.NOT_ALL_FIELDS });
       return;
     }
-    const payload = { userId: 'user.id', login: 'user.login' };
+    const user = await this._usersService.getUserByLogin(dto.login);
+    const passwordMatches = await bcrypt.compare(dto.password, user?.password);
+    if (!user || !passwordMatches) {
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ error: USER_ERRORS.USER_NOT_FOUND });
+      return;
+    }
+    const payload = { userId: user.id, login: user.login };
     const accessToken = this._jwtService.sign(payload);
     const refreshToken = this._jwtService.sign(payload, { expiresIn: TOKEN_REFRESH_EXPIRE_TIME });
     return { accessToken, refreshToken };
@@ -68,22 +76,23 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh token' })
   async refreshToken(
     @Res({ passthrough: true }) res: Response,
-    @Body() refreshToken: string,
+    @Body() dto: { refreshToken: string },
   ): Promise<{ accessToken: string; refreshToken?: string }> {
-    if (!refreshToken) {
+    if (!dto?.refreshToken) {
       res
         .status(StatusCodes.BAD_REQUEST)
         .send({ error: USER_ERRORS.INVALID_REFRESH_TOKEN });
       return;
     }
     try {
-      const payload = this._jwtService.verify(refreshToken);
+      const verifiedData = this._jwtService.verify(dto.refreshToken);
+      const payload = { userId: verifiedData.userId, login: verifiedData.login };
       const accessToken = this._jwtService.sign(payload);
       const newRefreshToken = this._jwtService.sign(payload, { expiresIn: TOKEN_REFRESH_EXPIRE_TIME });
       return { accessToken, refreshToken: newRefreshToken };
-    } catch (error) {
+    } catch {
       res
-        .status(StatusCodes.BAD_REQUEST)
+        .status(StatusCodes.UNAUTHORIZED)
         .send({ error: USER_ERRORS.INVALID_REFRESH_TOKEN });
       return;
     }

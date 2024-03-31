@@ -4,4 +4,5 @@ export enum USER_ERRORS {
   NOT_ALL_FIELDS = 'Not all required fields were provided',
   WRONG_OLD_PASSWORD = 'Wrong old password',
   INVALID_REFRESH_TOKEN = 'Invalid refresh token',
+  USER_NOT_FOUND = 'User not found',
 }
