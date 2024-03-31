@@ -9,7 +9,7 @@ import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
-const { REFRESH_TOKEN_EXPIRE_TIME } = process.env;
+const { TOKEN_REFRESH_EXPIRE_TIME } = process.env;
 
 @Controller('auth')
 export class AuthController {
@@ -60,7 +60,7 @@ export class AuthController {
     }
     const payload = { userId: 'user.id', login: 'user.login' };
     const accessToken = this._jwtService.sign(payload);
-    const refreshToken = this._jwtService.sign(payload, { expiresIn: REFRESH_TOKEN_EXPIRE_TIME });
+    const refreshToken = this._jwtService.sign(payload, { expiresIn: TOKEN_REFRESH_EXPIRE_TIME });
     return { accessToken, refreshToken };
   }
 
@@ -79,7 +79,7 @@ export class AuthController {
     try {
       const payload = this._jwtService.verify(refreshToken);
       const accessToken = this._jwtService.sign(payload);
-      const newRefreshToken = this._jwtService.sign(payload, { expiresIn: REFRESH_TOKEN_EXPIRE_TIME });
+      const newRefreshToken = this._jwtService.sign(payload, { expiresIn: TOKEN_REFRESH_EXPIRE_TIME });
       return { accessToken, refreshToken: newRefreshToken };
     } catch (error) {
       res

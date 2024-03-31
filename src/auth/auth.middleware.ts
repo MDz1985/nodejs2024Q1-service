@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthMiddleware implements NestMiddleware {
   constructor(private _jwtService: JwtService) {}
   use(req: Request, res: Response, next: () => void) {
-    const authHeader = req.headers.get('Authorization');
+    const authHeader = req.headers['authorization'];
     if (!authHeader) {
       throw new UnauthorizedException('Missing Authorization header');
     }
