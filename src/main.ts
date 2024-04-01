@@ -32,9 +32,6 @@ async function bootstrap() {
       `Unhandled Rejection at: ${promise}, reason: ${reason}`,
       LogLevel.ERROR,
     );
-    // loggingService.logError(
-    //   new Error(`Unhandled Rejection at: ${ promise }, reason: ${ reason }`),
-    // );
   });
   await app.listen(PORT);
   console.log(PORT, 'port is running');

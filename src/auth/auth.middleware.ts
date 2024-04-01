@@ -12,10 +12,10 @@ import { LogLevel } from '../common/enums/log-level';
 export class AuthMiddleware implements NestMiddleware {
   constructor(
     private readonly _jwtService: JwtService,
-    private readonly _loggingService: LoggingService
+    private readonly _loggingService: LoggingService,
   ) {}
   use(req: Request, res: Response, next: () => void) {
-    const requestMessage = `Request: METHOD=${req.method} URL=${req.url} QUERY=${JSON.stringify(req.query)} BODY=${JSON.stringify(req.body)}`;
+    const requestMessage = `Request: METHOD=${req.method} URL=${req.baseUrl} QUERY=${JSON.stringify(req.query)} BODY=${JSON.stringify(req.body)}`;
     this._loggingService.logMessage(requestMessage, LogLevel.INFO);
     res.on('finish', () => {
       const responseMessage = `Response: STATUS=${res.statusCode}`;
