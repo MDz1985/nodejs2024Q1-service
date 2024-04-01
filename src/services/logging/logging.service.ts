@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { WriteStream, createWriteStream, mkdir } from 'node:fs';
+import { createWriteStream, mkdir, WriteStream } from 'node:fs';
 import * as process from 'process';
 import { LogLevel } from '../../common/enums/log-level';
 
@@ -26,7 +26,7 @@ export class LoggingService {
 
   private logToFile(message: string, level = LogLevel.INFO) {
     const timestamp = new Date().toISOString();
-    const logMessage = `${timestamp} [${level}] ${message}\n`;
+    const logMessage = `${timestamp} [${LogLevel[level]}] ${message}\n`;
 
     this.logFileStream.write(logMessage);
 

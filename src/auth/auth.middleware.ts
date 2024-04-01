@@ -16,9 +16,11 @@ export class AuthMiddleware implements NestMiddleware {
   ) {}
   use(req: Request, res: Response, next: () => void) {
     const requestMessage = `Request: METHOD=${req.method} URL=${req.url} QUERY=${JSON.stringify(req.query)} BODY=${JSON.stringify(req.body)}`;
-    const responseMessage = `Response: STATUS=${res.statusCode}`;
     this._loggingService.logMessage(requestMessage, LogLevel.INFO);
-    this._loggingService.logMessage(responseMessage, LogLevel.INFO);
+    res.on('finish', () => {
+      const responseMessage = `Response: STATUS=${res.statusCode}`;
+      this._loggingService.logMessage(responseMessage, LogLevel.INFO);
+    });
 
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
