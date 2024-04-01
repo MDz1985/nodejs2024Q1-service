@@ -27,6 +27,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { USER_ERRORS } from './common/enums/errors.enum';
+import { getUserWithoutPassword } from './common/helpers/user.helper';
 
 @ApiTags('users')
 @Controller('user')
@@ -40,7 +41,7 @@ export class UsersController {
     description: 'Return the list of users',
     type: [User],
   })
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers() {
     return this.usersService.getAllUsers();
   }
 
@@ -57,7 +58,7 @@ export class UsersController {
   async getUserById(
     @Param('id') userId: string,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<User | { error: string }> {
+  ): Promise<Omit<User, 'password'> | { error: string }> {
     if (!validate(userId)) {
       res
         .status(StatusCodes.BAD_REQUEST)
@@ -71,7 +72,7 @@ export class UsersController {
         .send({ error: USER_ERRORS.USER_DOESNT_EXIST });
       return;
     }
-    return user;
+    return getUserWithoutPassword(user);
   }
 
   @Post()
@@ -148,7 +149,7 @@ export class UsersController {
         .send({ error: USER_ERRORS.WRONG_OLD_PASSWORD });
       return;
     }
-    return await this.usersService.updateUser(user, updatePasswordDto);
+    return await this.usersService.updateUser(user.id, updatePasswordDto);
   }
 
   @Delete(':id')
@@ -160,7 +161,7 @@ export class UsersController {
   @ApiNotFoundResponse({ description: USER_ERRORS.USER_DOESNT_EXIST })
   async deleteUser(
     @Param('id') userId: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ): Promise<void> {
     if (!validate(userId)) {
       res

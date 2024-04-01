@@ -2,43 +2,38 @@ import { Injectable } from '@nestjs/common';
 import { Album } from './common/interfaces/album.interface';
 import { CreateAlbumDto } from './common/dto/create-album.dto';
 import { UpdateAlbumDto } from './common/dto/update-album.dto';
+import { PrismaService } from '../services/prisma/prisma.service';
 
 @Injectable()
 export class AlbumsService {
-  private _albums: Album[] = [];
+  constructor(private readonly _prisma: PrismaService) {}
 
   async getAllAlbums(): Promise<Album[]> {
-    return this._albums;
+    return this._prisma.album.findMany();
   }
 
   async getAlbumById(id: string): Promise<Album | undefined> {
-    return this._albums.find((album) => album.id === id);
+    return this._prisma.album.findUnique({ where: { id } });
   }
 
   async createAlbum(dto: CreateAlbumDto): Promise<Album> {
-    const album = new Album(dto);
-    this._albums.push(album);
-    return album;
+    return this._prisma.album.create({ data: dto });
   }
 
   async updateAlbum(id: string, dto: UpdateAlbumDto): Promise<Album> {
-    const album = await this.getAlbumById(id);
-    if (album) {
-      Object.assign(album, dto);
-    }
-    return album;
+    return this._prisma.album.update({ where: { id }, data: dto });
   }
 
   async deleteAlbum(id: string): Promise<void> {
-    this._albums = this._albums.filter((album) => album.id !== id);
+    await this._prisma.album.delete({ where: { id } });
   }
 
   async removeArtistIdFromAlbum(artistId: string) {
-    this._albums = this._albums.map((album: Album) => {
-      if (album.artistId === artistId) {
-        album.artistId = null;
-      }
-      return album;
+    await this._prisma.album.updateMany({
+      where: { artistId },
+      data: {
+        artistId: null,
+      },
     });
   }
 }

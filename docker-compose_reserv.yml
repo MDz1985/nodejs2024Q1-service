@@ -1,0 +1,55 @@
+version: '3.9'
+services:
+  db:
+    restart: always
+    build:
+      context: .
+      dockerfile: db/Dockerfile
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+      DATABASE_URL: postgresql://myuser:mypassword@mydatabase:5432/mydatabase
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - postgres-logs:/var/log/postgresql
+    ports:
+      - "${PORT_DB}:${PORT_DB}"
+    networks:
+      - bridge-network
+    env_file:
+      - .env
+
+
+  nextjs:
+    restart: always
+    container_name: nextJs
+    image: mdz1985/nodejs2024q1-service-nextjs
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ./src:/app/src
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - bridge-network
+    env_file:
+      - .env
+
+
+volumes:
+  postgres-data:
+    driver: local
+  postgres-logs:
+    driver: local
+  node_modules:
+    driver: local
+  src_volume:
+    driver: local
+
+
+
+networks:
+  bridge-network:
+    driver: bridge

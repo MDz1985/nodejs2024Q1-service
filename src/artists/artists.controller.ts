@@ -25,8 +25,6 @@ import { validate } from 'uuid';
 import { Response } from 'express';
 import { CreateArtistDto } from './common/dto/create-artist.dto';
 import { UpdateArtistDto } from './common/dto/update-artist.dto';
-import { TracksService } from '../tracks/tracks.service';
-import { AlbumsService } from '../albums/albums.service';
 import { ARTIST_ERRORS } from './common/enums/errors.enum';
 
 @ApiTags('artists')
@@ -35,11 +33,7 @@ import { ARTIST_ERRORS } from './common/enums/errors.enum';
   description: 'Internal server error',
 })
 export class ArtistsController {
-  constructor(
-    private readonly artistsService: ArtistsService,
-    private readonly tracksService: TracksService,
-    private readonly albumsService: AlbumsService,
-  ) {}
+  constructor(private readonly artistsService: ArtistsService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all artists' })
@@ -165,7 +159,7 @@ export class ArtistsController {
   })
   async deleteArtist(
     @Param('id') artistId: string,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ): Promise<void> {
     if (!validate(artistId)) {
       res
@@ -181,8 +175,8 @@ export class ArtistsController {
       return;
     }
     await this.artistsService.deleteArtist(artistId);
-    await this.tracksService.removeArtistIdFromTrack(artistId);
-    await this.albumsService.removeArtistIdFromAlbum(artistId);
+    // await this.tracksService.removeArtistIdFromTrack(artistId);
+    // await this.albumsService.removeArtistIdFromAlbum(artistId);
     res.status(StatusCodes.NO_CONTENT).send();
   }
 }

@@ -1,0 +1,53 @@
+version: '3.9'
+services:
+  db:
+    restart: always
+    build:
+      context: .
+      dockerfile: db/Dockerfile
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:${POSTGRES_DATA_VOLUME}
+      - postgres-logs:${POSTGRES_LOGS_VOLUME}
+    ports:
+      - "${PORT_DB}:${PORT_DB}"
+    networks:
+      - bridge-network
+    env_file:
+      - .env
+
+
+  nextjs:
+    restart: always
+    container_name: ${APP_CONTAINER_NAME}
+    image: ${APP_IMAGE}
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ${APP_SRC_SEARCH_VOLUME}
+      - ${APP_PRISMA_SCHEMA_SEARCH_VOLUME}
+      - node_modules:${APP_NODE_MODULES_VOLUME}
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    networks:
+      - bridge-network
+    env_file:
+      - .env
+
+
+volumes:
+  postgres-data:
+    driver: ${VOLUMES_DRIVER}
+  postgres-logs:
+    driver: ${VOLUMES_DRIVER}
+  node_modules:
+    driver: ${VOLUMES_DRIVER}
+
+
+
+networks:
+  bridge-network:
+    driver: bridge

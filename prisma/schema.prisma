@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  login     String   @unique
+  password  String
+  version   Int      @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+
+  // todo: connect favorites to User when it will be possible
+  //   favorites Favorites?
+}
+
+model Artist {
+  id     String  @id @default(uuid())
+  name   String
+  grammy Boolean
+
+  tracks Track[]
+  albums Album[]
+}
+
+model Album {
+  id       String  @id @default(uuid())
+  name     String
+  year     Int
+  artistId String? @unique
+
+  tracks  Track[]
+  artists Artist? @relation(fields: [artistId], references: [id])
+}
+
+model Track {
+  id       String  @id @default(uuid())
+  name     String
+  artistId String? @unique
+  albumId  String? @unique
+  duration Int
+
+  artist Artist? @relation(fields: [artistId], references: [id])
+  album  Album?  @relation(fields: [albumId], references: [id])
+}
+
+model Favorites {
+  id Int @id @default(1)
+  // todo: connect Favorites to User when it will be possible (use userId instead of id)
+  //   userId String @unique
+  // user   User   @relation(fields: [userId], references: [id])
+
+  artists String[] @default([])
+  albums  String[] @default([])
+  tracks  String[] @default([])
+}

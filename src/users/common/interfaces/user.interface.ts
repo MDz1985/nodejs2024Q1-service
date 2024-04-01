@@ -23,3 +23,10 @@ export class User {
     this.updatedAt = Date.now();
   }
 }
+
+export type UserWithoutPassword = Omit<User, 'password'>;
+
+export type UserWithStringDates = Omit<User, 'createdAt' | 'updatedAt'> & {
+  createdAt: Date;
+  updatedAt: Date;
+};
