@@ -42,7 +42,8 @@
     "docker:scan": "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mdz1985/nodejs2024q1-service-nextjs --scanners vuln",
     "docker:tag": "docker tag nodejs2024q1-service-nextjs mdz1985/nodejs2024q1-service-nextjs",
     "docker:push-to-hub": "docker push mdz1985/nodejs2024q1-service-nextjs",
-    "docker:show-image-size": "docker images --filter=reference=mdz1985/nodejs2024q1-service-nextjs"
+    "docker:show-image-size": "docker images --filter=reference=mdz1985/nodejs2024q1-service-nextjs",
+    "docker:show-custom-logs-files": "docker exec -it nextJs /bin/sh -c 'cd /app/logs && ls -la && /bin/sh'"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.3",
