@@ -1,20 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { config } from 'dotenv';
 import { WriteStream, createWriteStream, mkdir } from 'node:fs';
 import * as process from 'process';
+import { LogLevel } from '../../common/enums/log-level';
 
-enum LogLevel {
-  DEBUG,
-  INFO,
-  WARN,
-  ERROR,
-}
-
-console.log('DEBUGf' in LogLevel);
-const LOG_LEVEL = process.env.LOG_LEVEL in LogLevel ? process.env.LOG_LEVEL as unknown as LogLevel : LogLevel.INFO;
+const LOG_LEVEL =
+  process.env.LOG_LEVEL in LogLevel
+    ? LogLevel[process.env.LOG_LEVEL]
+    : LogLevel.INFO;
 const LOG_FOLDER_PATH = process.env.LOG_FOLDER_PATH || './logs';
-
-
+console.log(LOG_LEVEL, 'LOG_LEVEL');
 @Injectable()
 export class LoggingService {
   constructor() {
@@ -22,16 +16,17 @@ export class LoggingService {
   }
 
   private readonly logger = new Logger(LoggingService.name);
-  private readonly logFileSizeLimit = (+process.env.LOG_FILE_SIZE_LIMIT || 1) * 1024;
+  private readonly logFileSizeLimit =
+    (+process.env.LOG_FILE_SIZE_LIMIT || 1) * 1024;
   private logFileStream: WriteStream;
 
   private get filePath(): string {
-    return `${ LOG_FOLDER_PATH }/${ new Date().toISOString() }.log`;
+    return `${LOG_FOLDER_PATH}/${new Date().toISOString()}.log`;
   }
 
-  private logToFile(message: string, level = 'INFO') {
+  private logToFile(message: string, level = LogLevel.INFO) {
     const timestamp = new Date().toISOString();
-    const logMessage = `${ timestamp } [${ level }] ${ message }\n`;
+    const logMessage = `${timestamp} [${level}] ${message}\n`;
 
     this.logFileStream.write(logMessage);
 
@@ -43,8 +38,17 @@ export class LoggingService {
     }
   }
 
-  log(message: string) {
-    switch (LOG_LEVEL) {
+  logMessage(message: string, level = LogLevel.INFO) {
+    if (LOG_LEVEL <= level) {
+      this.log(message, level);
+      // todo: remove after the end of the project;
+      process.stdout.write(message + '\n');
+      this.logToFile(message, level);
+    }
+  }
+
+  log(message: string, level: LogLevel) {
+    switch (level) {
       case LogLevel.INFO:
         this.logger.log(message);
         break;
@@ -68,32 +72,33 @@ export class LoggingService {
   //   this.log(responseMessage, LogLevel.INFO);
   // }
 
-  logError(error: Error) {
-    this.logger.error(error.message, error.stack);
-  }
+  // logError(error: Error) {
+  //   this.logger.error(error.message, error.stack);
+  //   this.logToFile(error.message);
+  // }
 
-  private logLevel: LogLevel =
-    LogLevel[process.env.LOG_LEVEL as keyof typeof LogLevel] || LogLevel.ERROR;
-
-  private shouldLog(level: LogLevel): boolean {
-    return level >= this.logLevel;
-  }
-
-  debug(message: string): void {
-    if (this.shouldLog(LogLevel.DEBUG)) {
-      process.stdout.write(`DEBUG: ${ message }\n`);
-
-    }
-  }
-
-  error(message: string, stack) {
-    process.stdout.write(`ERROR: ${ message }\n`);
-  }
+  // private logLevel: LogLevel =
+  //   LogLevel[process.env.LOG_LEVEL as keyof typeof LogLevel] || LogLevel.ERROR;
+  //
+  // private shouldLog(level: LogLevel): boolean {
+  //   return level >= this.logLevel;
+  // }
+  //
+  // debug(message: string): void {
+  //   if (this.shouldLog(LogLevel.DEBUG)) {
+  //     process.stdout.write(`DEBUG: ${ message }\n`);
+  //
+  //   }
+  // }
+  //
+  // error(message: string, stack) {
+  //   process.stdout.write(`ERROR: ${message}\n`);
+  // }
 
   private onInit() {
     mkdir(LOG_FOLDER_PATH, { recursive: true }, (err) => {
       if (err) throw err;
-      createWriteStream(this.filePath, { flags: 'a' });
+      this.logFileStream = createWriteStream(this.filePath, { flags: 'a' });
     });
   }
 }

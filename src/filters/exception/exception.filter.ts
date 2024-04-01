@@ -1,15 +1,10 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { LoggingService } from '../../services/logging/logging.service';
+import { LogLevel } from '../../common/enums/log-level';
 
 @Catch()
 export class CustomExceptionFilter<T> implements ExceptionFilter {
-  constructor(private readonly loggingService: LoggingService) {}
+  constructor(private readonly _loggingService: LoggingService) {}
 
   catch(exception: T, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -26,9 +21,9 @@ export class CustomExceptionFilter<T> implements ExceptionFilter {
         ? 'Internal server error'
         : (exception as HttpException).getResponse()['message'];
 
-    this.loggingService.error(
+    this._loggingService.logMessage(
       `HTTP ${status} Error: ${message}`,
-      (exception as HttpException).stack,
+      LogLevel.ERROR,
     );
 
     response.status(status).json({
