@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
-  constructor(private _jwtService: JwtService) {}
+  constructor(private readonly _jwtService: JwtService) {}
   use(req: Request, res: Response, next: () => void) {
     const authHeader = req.headers['authorization'];
     if (!authHeader) {

@@ -80,19 +80,27 @@ export class AuthController {
   ): Promise<{ accessToken: string; refreshToken?: string }> {
     if (!dto?.refreshToken) {
       res
-        .status(StatusCodes.BAD_REQUEST)
+        .status(StatusCodes.UNAUTHORIZED)
         .send({ error: USER_ERRORS.INVALID_REFRESH_TOKEN });
       return;
     }
     try {
       const verifiedData = this._jwtService.verify(dto.refreshToken);
-      const payload = { userId: verifiedData.userId, login: verifiedData.login };
+      const payload = {
+        userId: verifiedData.userId,
+        login: verifiedData.login,
+      };
       const accessToken = this._jwtService.sign(payload);
-      const newRefreshToken = this._jwtService.sign(payload, { expiresIn: TOKEN_REFRESH_EXPIRE_TIME });
-      return { accessToken, refreshToken: newRefreshToken };
+      const newRefreshToken = this._jwtService.sign(payload, {
+        expiresIn: TOKEN_REFRESH_EXPIRE_TIME,
+      });
+      res
+        .status(StatusCodes.OK)
+        .send({ accessToken, refreshToken: newRefreshToken });
+      return;
     } catch {
       res
-        .status(StatusCodes.UNAUTHORIZED)
+        .status(StatusCodes.FORBIDDEN)
         .send({ error: USER_ERRORS.INVALID_REFRESH_TOKEN });
       return;
     }
